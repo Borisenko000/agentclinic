@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: agentclinic-backend
+  datasource:
+    url: jdbc:sqlite:./data/agentclinic.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration

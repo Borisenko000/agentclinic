@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    # A fresh throwaway database per test context, outside backend/data/.
+    url: jdbc:sqlite:${java.io.tmpdir}/agentclinic-test/${random.uuid}.db
