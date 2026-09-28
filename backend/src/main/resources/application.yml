@@ -9,5 +9,11 @@ spring:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
       ddl-auto: validate
+  mvc:
+    problemdetails:
+      enabled: true
   flyway:
     locations: classpath:db/migration
+
+springdoc:
+  default-produces-media-type: application/json

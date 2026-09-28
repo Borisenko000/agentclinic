@@ -28,11 +28,11 @@ class FlywayMigrationTest {
     }
 
     @Test
-    void appliesInitialMigration() {
+    void appliesAllMigrationsSuccessfully() {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT version, success FROM flyway_schema_history WHERE version = '1'");
+                "SELECT version, success FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_rank");
 
-        assertThat(rows).hasSize(1);
-        assertThat(rows.getFirst().get("success")).isIn(1, true);
+        assertThat(rows).extracting(row -> row.get("version")).containsExactly("1", "2", "3");
+        assertThat(rows).allSatisfy(row -> assertThat(row.get("success")).isIn(1, true));
     }
 }
