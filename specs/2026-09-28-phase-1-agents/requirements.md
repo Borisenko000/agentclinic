@@ -136,3 +136,5 @@ _Заполняется по ходу работы._
 
 | # | Решение | Почему |
 |---|---------|--------|
+| R1 | Колонка `agent.id` объявлена `INTEGER PRIMARY KEY AUTOINCREMENT`, а в entity у `Long id` стоит `@Column(columnDefinition = "integer")`. | Автоинкремент в SQLite работает только у колонки ровно типа `INTEGER` (алиас rowid). Hibernate для `Long` ждёт `bigint`, и `ddl-auto: validate` падал. |
+| R2 | `created_at` (`TIMESTAMP` в миграции) хранится как миллисекунды Unix (`INTEGER`). Seed пишет их через `CAST(strftime('%s', '…Z') AS INTEGER) * 1000`. | sqlite-jdbc по умолчанию пишет `Timestamp` как миллисекунды, а текст разбирает только в формате `yyyy-MM-dd HH:mm:ss.SSS` в часовом поясе JVM. Числа не зависят от пояса и сортируются корректно. Закреплено тестами `AgentRepositoryTest`. |
