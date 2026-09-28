@@ -73,3 +73,17 @@ SQLite через Flyway. Оба приложения покрыты теста�
   и `mvnw`. CI работает на Linux.
 - **Тон проекта:** шутки допустимы в текстах интерфейса, но не в коде и тестах
   (принцип 3 из `mission.md`).
+
+## Решения, принятые при реализации
+
+| # | Решение | Почему |
+|---|---------|--------|
+| D12 | Версии: Spring Boot 4.1.1, Next.js 16.3, Tailwind 4, Vitest 5, Playwright 1.63. | Последние стабильные на 2026-09-28 (D2). |
+| D13 | Flyway работает с SQLite без отдельного модуля; Boot 4 / Hibernate 7 / `SQLiteDialect` запустились без предупреждений. | Проверено на Windows (этап 0.2), риск из «Контекста» снят. |
+| D14 | Каталог файла БД создаёт `SqliteDirectoryInitializer` (`BeanPostProcessor` над `HikariDataSource`). | Драйвер SQLite не создаёт отсутствующие каталоги, а `data/` не хранится в git. |
+| D15 | Тестовая БД — `${java.io.tmpdir}/agentclinic-test/<uuid>.db` (профиль `test`); E2E использует `backend/data/agentclinic-e2e.db`. | Тесты не трогают dev-данные (D9). |
+| D16 | shadcn/ui инициализирован с пресетом `base-nova` (на Base UI) и пакетом `cn` вместо `clsx` + `tailwind-merge`. | Текущие значения по умолчанию `shadcn init`. Самоссылку `--font-sans`, оставленную инициализатором, исправили на `--font-geist-sans`. |
+| D17 | Каркас страницы вынесен в `SiteLayout` (шапка + `main` + футер), `app/layout.tsx` только подключает его. | `RootLayout` рендерит `<html>` и шрифты `next/font`, его неудобно тестировать в Vitest. |
+| D18 | Проверка «375 px и 1280 px без горизонтального скролла» (5.6) автоматизирована в Playwright-smoke. | Проверяется в каждом прогоне CI, а не только вручную. |
+| D19 | Локально Playwright может использовать установленный Chrome: `PLAYWRIGHT_CHANNEL=chrome`. По умолчанию (и в CI) — скачанный Chromium. | С машины разработки `cdn.playwright.dev` не отдаёт Chromium (таймаут). |
+| D20 | В корне добавлен `.gitattributes`: `mvnw` всегда с LF, `*.cmd` с CRLF. | Иначе `./mvnw` ломается в Git Bash на Windows при `autocrlf=true`. |
