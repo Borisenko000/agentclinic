@@ -17,7 +17,7 @@
 
 ```bash
 cd backend
-./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run
+./mvnw spring-boot:run        # Windows (PowerShell): .\mvnw.cmd spring-boot:run
 ```
 
 При первом старте создаётся база `backend/data/agentclinic.db` и применяются
@@ -42,6 +42,7 @@ npm run dev
 
 ```bash
 ./mvnw verify                 # JUnit: health-эндпоинт и миграции Flyway
+                              # Windows (PowerShell): .\mvnw.cmd verify
 ```
 
 **Фронтенд** (`frontend/`):
