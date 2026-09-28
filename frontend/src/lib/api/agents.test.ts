@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type Agent, fetchAgent, fetchAgents } from "./agents";
+import { type Agent, createAgent, fetchAgent, fetchAgents } from "./agents";
 
 const agent: Agent = {
   id: 1,
@@ -81,5 +81,70 @@ describe("agents API (server)", () => {
       "http://localhost:8080/api/agents",
       expect.anything(),
     );
+  });
+});
+
+describe("createAgent (browser, via the /api proxy)", () => {
+  const form = { name: "Новый", model: "GPT-5", vendor: "", description: "" };
+
+  function problem(status: number, body: object) {
+    return new Response(JSON.stringify({ status, ...body }), {
+      status,
+      headers: { "Content-Type": "application/problem+json" },
+    });
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("posts the form to the proxy and returns the created agent", async () => {
+    const fetchMock = mockFetch(Response.json(agent, { status: 201 }));
+
+    await expect(createAgent(form)).resolves.toEqual({ ok: true, agent });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/agents",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }),
+    );
+  });
+
+  it("returns field errors for a validation problem", async () => {
+    mockFetch(
+      problem(400, {
+        title: "Bad Request",
+        detail: "Проверьте поля формы",
+        errors: { name: "Укажите имя" },
+      }),
+    );
+
+    await expect(createAgent(form)).resolves.toEqual({
+      ok: false,
+      errors: { name: "Укажите имя" },
+      message: "Проверьте поля формы",
+    });
+  });
+
+  it("returns the name error for a conflict", async () => {
+    mockFetch(
+      problem(409, {
+        title: "Conflict",
+        errors: { name: "Агент с таким именем уже зарегистрирован" },
+      }),
+    );
+
+    await expect(createAgent(form)).resolves.toMatchObject({
+      ok: false,
+      errors: { name: "Агент с таким именем уже зарегистрирован" },
+    });
+  });
+
+  it("throws on an unexpected server error", async () => {
+    mockFetch(new Response("Bad Gateway", { status: 502 }));
+
+    await expect(createAgent(form)).rejects.toThrow("HTTP 502");
   });
 });

@@ -9,24 +9,6 @@
     "description" : "Local backend"
   } ],
   "paths" : {
-    "/api/health" : {
-      "get" : {
-        "tags" : [ "Health" ],
-        "operationId" : "health",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/HealthResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/agents" : {
       "get" : {
         "tags" : [ "Agents" ],
@@ -41,6 +23,70 @@
                   "items" : {
                     "$ref" : "#/components/schemas/AgentResponse"
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Agents" ],
+        "operationId" : "createAgent",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateAgentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Агент зарегистрирован",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AgentResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Ошибки валидации; errors: поле -> сообщение",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiProblem"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Имя уже занято; errors.name",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiProblem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health" : {
+      "get" : {
+        "tags" : [ "Health" ],
+        "operationId" : "health",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/HealthResponse"
                 }
               }
             }
@@ -88,14 +134,31 @@
   },
   "components" : {
     "schemas" : {
-      "HealthResponse" : {
+      "CreateAgentRequest" : {
         "type" : "object",
         "properties" : {
-          "status" : {
-            "type" : "string"
+          "name" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 2
+          },
+          "model" : {
+            "type" : "string",
+            "maxLength" : 60,
+            "minLength" : 0
+          },
+          "vendor" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 60,
+            "minLength" : 0
+          },
+          "description" : {
+            "type" : [ "string", "null" ],
+            "maxLength" : 1000,
+            "minLength" : 0
           }
         },
-        "required" : [ "status" ]
+        "required" : [ "model", "name" ]
       },
       "AgentResponse" : {
         "type" : "object",
@@ -150,6 +213,15 @@
           }
         },
         "required" : [ "status", "title" ]
+      },
+      "HealthResponse" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "status" ]
       }
     }
   }
