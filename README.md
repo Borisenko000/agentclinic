@@ -34,14 +34,35 @@ npm run dev
 
 Фронтенд проксирует `/api/*` на бэкенд. Другой адрес бэкенда задаётся переменной
 `BACKEND_URL` (по умолчанию `http://localhost:8080`) до запуска `npm run dev` /
-`npm run build`.
+`npm run build`. Страницы агентов загружают данные на сервере Next.js, по тому же
+`BACKEND_URL`.
+
+## Что уже есть
+
+| Страница | Что делает |
+|----------|------------|
+| `/` | Главная и статус бэкенда |
+| `/agents` | Список агентов-пациентов по имени |
+| `/agents/{id}` | Профиль агента; для несуществующего — страница 404 |
+| `/agents/new` | Регистрация агента; после успеха открывается его профиль |
+
+| Эндпоинт | Ответ |
+|----------|-------|
+| `GET /api/health` | `{"status":"ok"}` |
+| `GET /api/agents` | Все агенты, отсортированные по имени |
+| `GET /api/agents/{id}` | Агент; `404` — нет такого, `400` — `id` не число |
+| `POST /api/agents` | `201` + `Location`; `400` — ошибки полей, `409` — имя занято (без учёта регистра) |
+
+Ошибки возвращаются в формате ProblemDetail (`application/problem+json`); для `400`
+и `409` поле `errors` содержит сообщения по полям. Миграция `V3__seed_agents.sql`
+заполняет базу шестью агентами, одинаковыми в dev, тестах и E2E.
 
 ## Тесты и проверки
 
 **Бэкенд** (`backend/`):
 
 ```bash
-./mvnw verify                 # JUnit: health-эндпоинт и миграции Flyway
+./mvnw verify                 # JUnit: миграции, API агентов и health, снимок OpenAPI
                               # Windows (PowerShell): .\mvnw.cmd verify
 ```
 
@@ -54,7 +75,9 @@ npm test                      # Vitest + React Testing Library
 npm run build                 # production-сборка и проверка типов
 ```
 
-**E2E** (`frontend/`) — Playwright сам поднимает бэкенд и фронтенд:
+**E2E** (`frontend/`) — Playwright сам поднимает бэкенд (на отдельной базе
+`backend/data/agentclinic-e2e.db`) и фронтенд. Уже запущенные локально серверы на
+портах 8080 и 3000 переиспользуются:
 
 ```bash
 npx playwright install chromium   # один раз

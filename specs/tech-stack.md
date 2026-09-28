@@ -24,7 +24,7 @@ agentproject/
 | База данных    | SQLite (`backend/data/agentclinic.db`); путь миграции на PostgreSQL |
 | Доступ к БД    | Spring Data JPA / Hibernate 7 (`hibernate-community-dialects` для SQLite) |
 | Миграции       | Flyway                                           |
-| API-контракт   | OpenAPI (springdoc-openapi) — с фазы 1           |
+| API-контракт   | OpenAPI (springdoc-openapi 3.x). Снимок `openapi/openapi.json` коммитится; `OpenApiSnapshotTest` падает, если он устарел (обновление: `-Dopenapi.update=true`) |
 | Тесты          | JUnit 5, Spring Boot Test, MockMvc               |
 
 ## Фронтенд
@@ -36,7 +36,7 @@ agentproject/
 | Фреймворк      | Next.js 16 (App Router)                          |
 | Стили          | Tailwind CSS 4                                   |
 | UI-компоненты  | shadcn/ui (на Base UI)                           |
-| Клиент API     | Типы, сгенерированные из OpenAPI-спецификации бэкенда (с фазы 1; до этого — вручную в `src/lib/api/`) |
+| Клиент API     | Типы из `openapi/openapi.json`, генерирует `openapi-typescript` (`npm run api:generate`) в `src/lib/api/schema.d.ts`; файл коммитится, CI проверяет, что он актуален. Server Components ходят на `BACKEND_URL` напрямую, клиентские компоненты — через прокси `/api` |
 | Доступ к API   | Прокси Next.js: `/api/*` → `BACKEND_URL` (по умолчанию `http://localhost:8080`), один origin, без CORS |
 | Стиль кода     | ESLint + Prettier                                |
 | Юнит-тесты     | Vitest + React Testing Library                   |
