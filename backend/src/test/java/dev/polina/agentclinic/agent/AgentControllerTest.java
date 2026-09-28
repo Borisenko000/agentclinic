@@ -80,4 +80,48 @@ class AgentControllerTest {
         assertThat(withoutVendor).isNotEmpty();
         assertThat(withoutDescription).isNotEmpty();
     }
+
+    @Test
+    void getsAgentById() throws Exception {
+        long id = idOf("Overfit");
+
+        mockMvc.perform(get("/api/agents/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {
+                          "id": %d,
+                          "name": "Overfit",
+                          "model": "Llama 4",
+                          "vendor": "Meta",
+                          "description": "Идеально отвечает на вопросы из обучающей выборки. На всё остальное — тоже, но неправильно.",
+                          "createdAt": "2026-09-01T09:00:00Z"
+                        }
+                        """.formatted(id), true));
+    }
+
+    @Test
+    void returnsNotFoundProblemForUnknownAgent() throws Exception {
+        mockMvc.perform(get("/api/agents/{id}", 999_999))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.title").value("Not Found"))
+                .andExpect(jsonPath("$.detail").value("Агент 999999 не найден"));
+    }
+
+    @Test
+    void returnsBadRequestProblemForNonNumericId() throws Exception {
+        mockMvc.perform(get("/api/agents/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    private long idOf(String name) throws Exception {
+        String body = mockMvc.perform(get("/api/agents"))
+                .andReturn().getResponse().getContentAsString();
+        List<Number> ids = JsonPath.read(body, "$[?(@.name == '" + name + "')].id");
+        return ids.getFirst().longValue();
+    }
 }

@@ -15,6 +15,12 @@ public class AgentService {
         this.repository = repository;
     }
 
+    public AgentResponse findById(long id) {
+        return repository.findById(id)
+                .map(AgentResponse::from)
+                .orElseThrow(() -> new AgentNotFoundException(id));
+    }
+
     public List<AgentResponse> findAll() {
         return repository.findAllByOrderByNameKeyAsc().stream()
                 .map(AgentResponse::from)
