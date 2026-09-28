@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
-
-const UPCOMING_SECTIONS = ["Агенты", "Недуги"];
+import { MainNav } from "@/components/main-nav";
 
 export function SiteHeader() {
   return (
@@ -10,31 +8,7 @@ export function SiteHeader() {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           AgentClinic
         </Link>
-        <nav aria-label="Основная навигация">
-          <ul className="flex flex-wrap items-center gap-1">
-            <li>
-              <Link
-                href="/"
-                aria-current="page"
-                className={buttonVariants({ variant: "ghost", size: "sm" })}
-              >
-                Главная
-              </Link>
-            </li>
-            {UPCOMING_SECTIONS.map((section) => (
-              <li key={section}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled
-                  title="Раздел скоро появится"
-                >
-                  {section}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <MainNav />
       </div>
     </header>
   );
