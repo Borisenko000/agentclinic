@@ -41,7 +41,11 @@ export function BackendStatus() {
   return (
     <p className="flex items-center gap-2 text-sm text-muted-foreground">
       Статус бэкенда:
-      <Badge variant={VARIANTS[status]} data-status={status}>
+      <Badge
+        variant={VARIANTS[status]}
+        data-testid="backend-status"
+        data-state={status}
+      >
         {LABELS[status]}
       </Badge>
     </p>

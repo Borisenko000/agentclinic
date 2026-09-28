@@ -19,7 +19,7 @@ test("home page shows welcome, header and live backend status", async ({
   ).toBeVisible();
   await expect(page.getByRole("contentinfo")).toBeVisible();
 
-  await expect(page.locator("[data-status]")).toHaveText("ok");
+  await expect(page.getByTestId("backend-status")).toHaveText("ok");
 });
 
 for (const width of [375, 1280]) {
