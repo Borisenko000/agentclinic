@@ -19,12 +19,12 @@ agentproject/
 | Область        | Выбор                                            |
 |----------------|--------------------------------------------------|
 | Язык           | Java 21                                          |
-| Фреймворк      | Spring Boot 3 (Web, Validation, Data JPA)        |
+| Фреймворк      | Spring Boot 4 (WebMVC, Validation, Data JPA)     |
 | Сборка         | Maven (с Maven Wrapper)                          |
-| База данных    | SQLite на старте; путь миграции на PostgreSQL    |
-| Доступ к БД    | Spring Data JPA / Hibernate (`hibernate-community-dialects` для SQLite) |
+| База данных    | SQLite (`backend/data/agentclinic.db`); путь миграции на PostgreSQL |
+| Доступ к БД    | Spring Data JPA / Hibernate 7 (`hibernate-community-dialects` для SQLite) |
 | Миграции       | Flyway                                           |
-| API-контракт   | OpenAPI (springdoc-openapi)                      |
+| API-контракт   | OpenAPI (springdoc-openapi) — с фазы 1           |
 | Тесты          | JUnit 5, Spring Boot Test, MockMvc               |
 
 ## Фронтенд
@@ -32,12 +32,15 @@ agentproject/
 | Область        | Выбор                                            |
 |----------------|--------------------------------------------------|
 | Язык           | TypeScript (strict)                              |
-| Фреймворк      | Next.js (App Router)                             |
-| Стили          | Tailwind CSS                                     |
-| UI-компоненты  | shadcn/ui                                        |
-| Клиент API     | Типы, сгенерированные из OpenAPI-спецификации бэкенда |
+| Среда          | Node.js 24 LTS, пакетный менеджер npm            |
+| Фреймворк      | Next.js 16 (App Router)                          |
+| Стили          | Tailwind CSS 4                                   |
+| UI-компоненты  | shadcn/ui (на Base UI)                           |
+| Клиент API     | Типы, сгенерированные из OpenAPI-спецификации бэкенда (с фазы 1; до этого — вручную в `src/lib/api/`) |
+| Доступ к API   | Прокси Next.js: `/api/*` → `BACKEND_URL` (по умолчанию `http://localhost:8080`), один origin, без CORS |
+| Стиль кода     | ESLint + Prettier                                |
 | Юнит-тесты     | Vitest + React Testing Library                   |
-| E2E-тесты      | Playwright (поднимает фронтенд и бэкенд вместе)  |
+| E2E-тесты      | Playwright, Chromium (поднимает фронтенд и бэкенд вместе) |
 
 ## Целевая платформа
 
@@ -49,4 +52,5 @@ agentproject/
 - Сущности предметной области: **Agent**, **Ailment** (недуг), **Treatment**
   (метод лечения), **Appointment** (запись на приём), **Staff** (персонал).
 - Изменения схемы БД — только через миграции Flyway.
-- Каждый PR проходит `./mvnw verify` в `backend/` и `lint` + `test` во `frontend/`.
+- Каждый PR проходит в GitHub Actions `./mvnw verify` в `backend/`,
+  `lint` + `format:check` + `test` + `build` во `frontend/` и E2E-smoke на Playwright.

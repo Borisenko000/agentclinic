@@ -1,0 +1,2 @@
+-- Initial migration: no tables yet.
+-- Domain tables (agents, ailments, ...) arrive in later migrations starting with phase 1.
