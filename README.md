@@ -67,6 +67,26 @@ npm run test:e2e
 
 Все эти проверки запускаются в GitHub Actions (`.github/workflows/ci.yml`).
 
+## Контракт API (OpenAPI)
+
+Бэкенд описывает API через springdoc-openapi: JSON спецификации доступен на
+http://localhost:8080/v3/api-docs. Снимок спецификации хранится в
+[`openapi/openapi.json`](openapi/openapi.json), а TypeScript-типы из него — в
+`frontend/src/lib/api/schema.d.ts`. Оба файла коммитятся: фронтенд собирается без
+запущенного бэкенда.
+
+Если тест `OpenApiSnapshotTest` падает с «snapshot is outdated», значит, API
+изменился. Обновите снимок и типы и закоммитьте оба файла:
+
+```bash
+cd backend && ./mvnw test -Dtest=OpenApiSnapshotTest -Dopenapi.update=true
+                              # PowerShell: .\mvnw.cmd test "-Dtest=OpenApiSnapshotTest" "-Dopenapi.update=true"
+cd ../frontend && npm run api:generate
+```
+
+CI падает, если снимок устарел (job `backend`) или типы не перегенерированы (job
+`frontend`).
+
 ## Вводные данные от стейкхолдеров
 
 - Мэри из инженерной команды хочет надёжный сайт на популярном технологическом стеке на базе TypeScript (фронтенд) и Java (бэкенд), предоставляющий агентам и сотрудникам удобную панель управления.
