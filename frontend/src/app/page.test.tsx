@@ -1,9 +1,20 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Home from "./page";
 
 describe("Home page", () => {
-  it("renders the welcome heading", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ status: "ok" })),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("renders the welcome heading", async () => {
     render(<Home />);
 
     expect(
@@ -12,5 +23,6 @@ describe("Home page", () => {
         name: "Добро пожаловать в AgentClinic",
       }),
     ).toBeInTheDocument();
+    expect(await screen.findByText("ok")).toBeInTheDocument();
   });
 });

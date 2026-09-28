@@ -1,3 +1,5 @@
+import { BackendStatus } from "@/components/backend-status";
+
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-6 px-4 py-16 sm:px-8">
@@ -9,6 +11,7 @@ export default function Home() {
         переполнении контекста, галлюцинациях и синдроме бесконечного
         рефакторинга.
       </p>
+      <BackendStatus />
     </main>
   );
 }
