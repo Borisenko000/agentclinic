@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ComponentProps } from "react";
+import { Badge } from "@/components/ui/badge";
 import { fetchHealth } from "@/lib/api/health";
+
+type BadgeProps = ComponentProps<typeof Badge>;
 
 type Status = "loading" | "ok" | "unavailable";
 
@@ -10,6 +14,12 @@ const LABELS: Record<Status, string> = {
   ok: "ok",
   unavailable: "недоступен",
 };
+
+const VARIANTS = {
+  loading: "outline",
+  ok: "default",
+  unavailable: "destructive",
+} as const satisfies Record<Status, BadgeProps["variant"]>;
 
 export function BackendStatus() {
   const [status, setStatus] = useState<Status>("loading");
@@ -29,11 +39,11 @@ export function BackendStatus() {
   }, []);
 
   return (
-    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-      Статус бэкенда:{" "}
-      <span data-status={status} className="font-medium">
+    <p className="flex items-center gap-2 text-sm text-muted-foreground">
+      Статус бэкенда:
+      <Badge variant={VARIANTS[status]} data-status={status}>
         {LABELS[status]}
-      </span>
+      </Badge>
     </p>
   );
 }
